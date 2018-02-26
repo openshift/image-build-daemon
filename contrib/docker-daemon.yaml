@@ -1,0 +1,49 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: build-daemon
+spec:
+  selector:
+    matchLabels:
+      app: build-daemon
+  template:
+    metadata:
+      labels:
+        app: build-daemon
+    spec:
+      containers:
+      - name: docker
+        image: openshift/origin-custom-docker-builder:latest
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/bash
+        - -c
+        - |
+          #!/bin/bash
+          set -o errexit
+          rm -rf /usr/libexec/oci/hooks.d/*
+          exec dockerd-current --iptables=false --storage-driver=overlay2 --add-runtime docker-runc=/usr/libexec/docker/docker-runc-current --default-runtime=docker-runc --userland-proxy-path=/usr/libexec/docker/docker-proxy-current --exec-opt native.cgroupdriver=systemd
+        securityContext:
+          runAsUser: 0
+          privileged: true
+        volumeMounts:
+        - mountPath: /run/systemd
+          name: host-run-systemd
+        - mountPath: /var/run/dbus
+          name: host-var-run-dbus
+        - mountPath: /sys/fs/cgroup
+          name: host-sys-fs-cgroup
+        - mountPath: /var/lib/docker
+          name: storage
+      volumes:
+      - name: host-run-systemd
+        hostPath:
+          path: /run/systemd
+      - name: host-var-run-dbus
+        hostPath:
+          path: /var/run/dbus
+      - name: host-sys-fs-cgroup
+        hostPath:
+          path: /sys/fs/cgroup
+      - name: storage
+        emptyDir: {}

@@ -1,0 +1,28 @@
+package: github.com/openshift/image-build-daemon
+import:
+- package: github.com/MakeNowJust/heredoc
+- package: github.com/davecgh/go-spew
+  subpackages:
+  - spew
+- package: github.com/docker/docker
+  version: b68221c37ee597950364788204546f9c9d0e46a1
+  subpackages:
+  - api
+  - builder/dockerfile/parser
+  - pkg/archive
+  - pkg/homedir
+- package: github.com/fsouza/go-dockerclient
+  repo:    git@github.com:openshift/go-dockerclient
+  version: openshift-3.9
+- package: github.com/golang/glog
+- package: github.com/gorilla/context
+- package: github.com/openshift/imagebuilder
+  version: master
+  subpackages:
+  - dockerclient
+- package: github.com/spf13/cobra
+- package: github.com/spf13/pflag
+testImport:
+- package: github.com/stretchr/testify
+  subpackages:
+  - assert
